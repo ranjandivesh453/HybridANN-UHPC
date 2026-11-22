@@ -1,0 +1,49 @@
+{
+ "n_pareto": 725,
+ "hv_nsga": 1.0003575454239733,
+ "hv_grid": 1.0015544306077566,
+ "hv_ratio": 0.9988049724036895,
+ "grid_feasible": 15117,
+ "grid_candidates": 37181,
+ "ranges": {
+  "fc": [
+   124.87518766265177,
+   149.6850029741235
+  ],
+  "CO2": [
+   305.6116068109896,
+   570.3254386737879
+  ],
+  "cost": [
+   135.47842704660673,
+   250.49026555623868
+  ]
+ },
+ "max_plain_lower_bound": 139.818702490409,
+ "n_steel": 65,
+ "n_pp": 0,
+ "settings": {
+  "algorithm": "NSGA-III (pymoo)",
+  "population": 300,
+  "generations": 500,
+  "runs": 5,
+  "sbx_eta": 15,
+  "sbx_prob": 0.9,
+  "pm_eta": 20,
+  "reference_directions": 300,
+  "fc_lower_bound_min": 120.0,
+  "curing_temp": 28.0,
+  "age": 28.0
+ },
+ "representatives": {
+  "Maximum strength": 1,
+  "Minimum CO2": 126,
+  "Best efficiency (max fc/CO2)": 126,
+  "Minimum cost": 725,
+  "Balanced (knee)": 204,
+  "TOPSIS (equal weights)": 523,
+  "TOPSIS strength-led (0.6/0.2/0.2)": 242,
+  "TOPSIS carbon-led (0.2/0.6/0.2)": 253,
+  "TOPSIS cost-led (0.2/0.2/0.6)": 688
+ }
+}

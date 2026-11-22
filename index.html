@@ -1,0 +1,301 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width, initial-scale=1.0">
+<title>HybridANN-UHPC: Uncertainty-aware hybrid ANNs for strength prediction and mix design optimization of sustainable UHPC</title>
+<meta name="description" content="Project page and interactive mix designer for hybrid ANN (ASO, AEO, WDO) prediction of UHPC compressive strength with split-conformal intervals and NSGA-III optimization of strength, embodied CO2 and cost.">
+<script defer src="model.js"></script>
+<script defer src="pareto_data.js"></script>
+<script defer src="inference.js"></script>
+<script defer src="topsis.js"></script>
+<script defer src="app.js"></script>
+<style>
+  *, *::before, *::after { margin: 0; padding: 0; box-sizing: border-box; }
+  html { scroll-behavior: smooth; }
+  :root { --accent: #2f6fb5; --accent-2: #255a94; --ink: #1f2937; --muted: #6b7280; --line: #e5e7eb; --soft: #f6f8fb; --ok: #1b7f4b; --warn: #a15c00; }
+  body { font-family: "Noto Sans", "Segoe UI", system-ui, -apple-system, Roboto, "Helvetica Neue", Arial, sans-serif; font-size: 1.02rem; line-height: 1.68; color: #333; background: #fff; -webkit-font-smoothing: antialiased; }
+  a { color: var(--accent); text-decoration: none; } a:hover { text-decoration: underline; }
+  code { font-family: "JetBrains Mono", ui-monospace, SFMono-Regular, Menlo, Consolas, monospace; font-size: .86em; background: #f3f4f6; padding: .05rem .3rem; border-radius: 4px; }
+  .section { max-width: 920px; margin: 0 auto; padding: 1.8rem 1.5rem; }
+  .title-section { text-align: center; padding-top: 3.6rem; padding-bottom: 1rem; }
+  .kicker { font-weight: 700; letter-spacing: .04em; color: var(--accent); font-size: 1.05rem; margin-bottom: .4rem; }
+  .project-title { font-size: clamp(1.55rem, 3vw, 2.2rem); font-weight: 700; line-height: 1.3; color: #222; margin-bottom: 1.1rem; }
+  .authors { font-size: 1.1rem; margin-bottom: .35rem; color: var(--ink); }
+  .affiliations { font-size: .9rem; color: #777; margin-bottom: .3rem; }
+  .affiliations span { margin: 0 .45rem; display: inline-block; }
+  .venue { font-size: .9rem; color: var(--muted); font-style: italic; margin-bottom: .9rem; }
+  .buttons-row { display: flex; justify-content: center; gap: .65rem; flex-wrap: wrap; }
+  .btn { display: inline-flex; align-items: center; gap: .45rem; padding: .55rem 1.25rem; font-size: .94rem; font-weight: 500; color: #333; background: #fff; border: 1.5px solid #d0d0d0; border-radius: 999px; transition: all .15s; }
+  .btn:hover { border-color: var(--accent); background: #f7faff; text-decoration: none; }
+  .btn-primary { background: var(--accent); color: #fff; border-color: var(--accent); }
+  .btn-primary:hover { background: var(--accent-2); color: #fff; }
+  .btn-note { font-size: .78rem; color: #999; font-weight: 400; }
+  h2 { font-size: 1.65rem; font-weight: 600; color: #222; margin-bottom: .9rem; padding-bottom: .35rem; border-bottom: 2px solid #eee; }
+  h3 { font-size: 1.1rem; font-weight: 600; color: #222; margin: 1.2rem 0 .5rem; }
+  p + p { margin-top: .7rem; }
+  .abstract-text { text-align: justify; hyphens: auto; }
+  .stats { display: grid; grid-template-columns: repeat(auto-fit, minmax(150px, 1fr)); gap: .8rem; margin-top: 1.2rem; }
+  .stat { border: 1px solid var(--line); border-radius: 12px; padding: .8rem 1rem; background: #fff; }
+  .stat b { display: block; font-size: 1.45rem; color: var(--ink); line-height: 1.2; }
+  .stat span { font-size: .84rem; color: var(--muted); }
+  figure { margin: 0; text-align: center; }
+  figure img { max-width: 100%; height: auto; border-radius: 12px; border: 1px solid #e6e8ec; box-shadow: 0 4px 16px rgba(15,23,42,.06); }
+  figcaption { margin-top: .7rem; font-size: .9rem; color: #666; line-height: 1.55; text-align: left; }
+  .module-list { margin-top: 1rem; display: grid; gap: .65rem; }
+  .module-list p { margin: 0; padding: .35rem 0 .35rem .8rem; border-left: 3px solid var(--accent); }
+  .results-table { width: 100%; border-collapse: collapse; margin: 1rem 0; font-size: .93rem; }
+  .results-table th { text-align: left; padding: .55rem .7rem; font-weight: 600; background: #f8f9fa; border-bottom: 2px solid #ddd; color: #333; }
+  .results-table td { padding: .48rem .7rem; border-bottom: 1px solid #eee; font-variant-numeric: tabular-nums; }
+  .results-table tr.sel td, .results-table tr.best td { background: #f1f7ff; font-weight: 600; }
+  .results-table.compact { font-size: .88rem; }
+  .table-note { font-size: .84rem; color: var(--muted); }
+  .scroll { overflow-x: auto; }
+  .scroll .results-table { min-width: 600px; }
+  /* demo */
+  .demo-wrapper { background: var(--soft); border-top: 1px solid var(--line); border-bottom: 1px solid var(--line); padding: 1rem 0 2rem; margin: 1rem 0; }
+  .demo-section { max-width: 1080px; margin: 0 auto; padding: 1.5rem; }
+  .demo-card { background: #fff; border: 1px solid var(--line); border-radius: 16px; box-shadow: 0 6px 24px rgba(15,23,42,.05); overflow: hidden; }
+  .tabs { display: flex; border-bottom: 1px solid var(--line); background: #fbfcfe; flex-wrap: wrap; }
+  .tab-btn { flex: 1; min-width: 160px; padding: .95rem 1rem; font-size: .98rem; font-weight: 600; color: var(--muted); background: none; border: none; border-bottom: 3px solid transparent; cursor: pointer; font-family: inherit; }
+  .tab-btn.active { color: var(--accent); border-bottom-color: var(--accent); background: #fff; }
+  .tab-panel { display: none; padding: 1.4rem 1.5rem 1.6rem; }
+  .tab-panel.active { display: block; }
+  .panel-intro { font-size: .93rem; color: #555; margin-bottom: 1rem; }
+  .grid { display: grid; gap: .9rem 1rem; }
+  .grid-4 { grid-template-columns: repeat(auto-fit, minmax(190px, 1fr)); }
+  .field label { display: block; font-size: .84rem; font-weight: 600; color: #374151; margin-bottom: .25rem; }
+  .field small { display: block; font-size: .76rem; color: var(--muted); margin-top: .15rem; min-height: 1em; }
+  .field-input, select { width: 100%; padding: .5rem .65rem; font-size: .95rem; border: 1.5px solid #d1d5db; border-radius: 8px; font-family: inherit; background: #fff; color: #111; }
+  .field-input:focus, select:focus { outline: none; border-color: var(--accent); box-shadow: 0 0 0 3px rgba(47,111,181,.15); }
+  .field-input:disabled { background: #f3f4f6; color: #9ca3af; }
+  .derived { padding: .5rem .65rem; border: 1.5px dashed #d1d5db; border-radius: 8px; font-size: .92rem; color: #374151; background: #fafafa; }
+  .actions { margin-top: 1.1rem; display: flex; gap: .7rem; align-items: center; flex-wrap: wrap; }
+  .btn-predict { padding: .62rem 1.6rem; font-size: .98rem; font-weight: 600; color: #fff; background: var(--accent); border: none; border-radius: 999px; cursor: pointer; font-family: inherit; }
+  .btn-predict:hover { background: var(--accent-2); }
+  .btn-small { margin-top: .6rem; padding: .3rem .9rem; font-size: .82rem; font-weight: 600; color: var(--accent); background: #fff; border: 1.5px solid var(--accent); border-radius: 999px; cursor: pointer; font-family: inherit; }
+  .btn-small:hover { background: #f1f7ff; }
+  td .btn-small { margin-top: 0; }
+  #result { margin-top: 1.4rem; }
+  .res-grid { display: grid; grid-template-columns: 1.15fr 1fr; gap: 1.2rem; }
+  @media (max-width: 760px) { .res-grid, .mix-grid.two { grid-template-columns: 1fr !important; } }
+  .res-main { border: 1px solid var(--line); border-radius: 14px; padding: 1.1rem 1.2rem; }
+  .res-label { font-size: .85rem; color: var(--muted); font-weight: 600; text-transform: uppercase; letter-spacing: .03em; }
+  .res-value { font-size: 2.6rem; font-weight: 700; color: var(--ink); line-height: 1.15; font-variant-numeric: tabular-nums; }
+  .res-value span, .mix-strength span { font-size: 1.1rem; color: var(--muted); font-weight: 500; }
+  .res-pi { font-size: .95rem; color: #374151; }
+  .res-meas { font-size: .9rem; color: #374151; margin-top: .35rem; }
+  .badge { display: inline-block; font-size: .8rem; font-weight: 600; padding: .22rem .7rem; border-radius: 999px; }
+  .badge.ok { background: #e8f5ee; color: var(--ok); }
+  .badge.warn { background: #fff4e5; color: var(--warn); }
+  .tag { font-size: .7rem; font-weight: 600; color: var(--accent); background: #eef4fb; padding: .05rem .45rem; border-radius: 999px; margin-left: .25rem; }
+  .warn-list { margin: .6rem 0 0 1.1rem; font-size: .86rem; color: var(--warn); }
+  p.warn { color: var(--warn); font-size: .95rem; }
+  .kv { width: 100%; border-collapse: collapse; font-size: .88rem; }
+  .kv th { text-align: left; font-size: .76rem; text-transform: uppercase; letter-spacing: .03em; color: var(--muted); padding: .45rem 0 .2rem; border-bottom: 1px solid var(--line); }
+  .kv td { padding: .28rem 0; border-bottom: 1px dashed #eee; vertical-align: top; font-variant-numeric: tabular-nums; }
+  .kv td:last-child { text-align: right; padding-left: .8rem; }
+  .note { font-size: .82rem; color: var(--muted); margin-top: .5rem; }
+  .slider-row { display: flex; gap: 1rem; align-items: center; max-width: 620px; }
+  input[type=range] { accent-color: var(--accent); }
+  .mix-grid { display: grid; grid-template-columns: repeat(auto-fit, minmax(260px, 1fr)); gap: 1rem; margin: 1rem 0; }
+  .mix-grid.two { grid-template-columns: 1fr 1.25fr; }
+  .mix-card { border: 1px solid var(--line); border-radius: 14px; padding: 1rem 1.1rem; background: #fff; }
+  .mix-title { font-size: .82rem; font-weight: 700; color: var(--accent); text-transform: uppercase; letter-spacing: .04em; }
+  .mix-strength { font-size: 2rem; font-weight: 700; color: var(--ink); line-height: 1.2; }
+  .mix-pi { font-size: .86rem; color: #555; margin-bottom: .4rem; }
+  .weights { display: grid; grid-template-columns: repeat(auto-fit, minmax(220px, 1fr)); gap: .8rem 1.4rem; max-width: 820px; }
+  .weights label { font-size: .88rem; font-weight: 600; color: #374151; display: flex; justify-content: space-between; }
+  .weights input { width: 100%; }
+  .wval { font-variant-numeric: tabular-nums; color: var(--accent); }
+  .presets { display: flex; gap: .5rem; flex-wrap: wrap; margin: .8rem 0 .2rem; }
+  .presets button { padding: .3rem .8rem; font-size: .82rem; border: 1px solid #d1d5db; background: #fff; border-radius: 999px; cursor: pointer; font-family: inherit; color: #374151; }
+  .presets button:hover { border-color: var(--accent); color: var(--accent); }
+  .chart-head { font-size: .85rem; font-weight: 600; color: #374151; display: flex; justify-content: space-between; align-items: center; gap: .5rem; }
+  .chart { width: 100%; height: auto; display: block; }
+  .chart .grid { stroke: #eef0f3; stroke-width: 1; }
+  .chart .tick { font-size: 10px; fill: #6b7280; }
+  .chart .axis { font-size: 11px; fill: #374151; }
+  .chart .thr { stroke: #9ca3af; stroke-dasharray: 4 3; }
+  .chart circle.tested { fill: #fff; stroke: #8b8f97; stroke-width: 1.2; }
+  .chart circle.best { fill: none; stroke: #c2410c; stroke-width: 2.4; }
+  .legend { display: flex; gap: 1rem; flex-wrap: wrap; font-size: .78rem; color: #555; margin-top: .2rem; }
+  .dot { display: inline-block; width: 9px; height: 9px; border-radius: 50%; margin-right: .3rem; vertical-align: -1px; }
+  .dot.p { background: hsl(214,62%,50%); } .dot.t { border: 1.4px solid #8b8f97; background: #fff; } .dot.b { border: 2px solid #c2410c; }
+  #tip { position: absolute; display: none; pointer-events: none; background: #fff; border: 1px solid #d1d5db; border-radius: 8px; padding: .4rem .6rem; font-size: .8rem; line-height: 1.45; color: #222; box-shadow: 0 4px 14px rgba(0,0,0,.08); z-index: 10; }
+  .bibtex-wrap { position: relative; }
+  .bibtex-wrap pre { background: #f8f9fa; border: 1px solid var(--line); border-radius: 10px; padding: 1rem 1.1rem; overflow-x: auto; font-size: .84rem; line-height: 1.5; }
+  .copy-btn { position: absolute; top: .6rem; right: .6rem; padding: .25rem .75rem; font-size: .8rem; border: 1px solid #d1d5db; background: #fff; border-radius: 6px; cursor: pointer; }
+  ul.plain { margin-left: 1.2rem; } ul.plain li { margin: .2rem 0; }
+  footer { text-align: center; font-size: .85rem; color: #888; padding: 2rem 1rem 3rem; border-top: 1px solid #eee; margin-top: 1.5rem; }
+</style>
+</head>
+<body>
+
+<!-- ═══ TITLE ═══ -->
+<div class="section title-section">
+  <div class="kicker">HybridANN-UHPC</div>
+  <h1 class="project-title">Uncertainty-aware hybrid artificial neural networks for strength prediction and mix design optimization of sustainable ultra-high-performance concrete</h1>
+  <div class="authors">Divesh Ranjan Kumar<sup>1</sup>, Shubhum Prakash<sup>2</sup>, Teerapong Senjuntichai<sup>1,*</sup>, Sakdirat Kaewunruen<sup>3</sup></div>
+  <div class="affiliations">
+    <span><sup>1</sup>Chulalongkorn University, Bangkok, Thailand</span>
+    <span><sup>2</sup>Lakshmi Narain College of Technology, Bhopal, India</span>
+    <span><sup>3</sup>University of Birmingham, United Kingdom</span>
+  </div>
+  <div class="venue">Journal of Asian Architecture and Building Engineering (under review)</div>
+  <div class="buttons-row">
+    <a class="btn" href="#cite">Paper <span class="btn-note">(under review)</span></a>
+    <a class="btn btn-primary" href="#predictor">Try the predictor</a>
+    <a class="btn" href="https://github.com/ranjandivesh453/HybridANN-UHPC" target="_blank" rel="noopener"><svg width="18" height="18" viewBox="0 0 24 24" fill="currentColor" aria-hidden="true"><path d="M12 .5C5.37.5 0 5.87 0 12.5c0 5.3 3.44 9.8 8.21 11.39.6.11.82-.26.82-.58v-2.03c-3.34.73-4.04-1.61-4.04-1.61-.55-1.39-1.33-1.76-1.33-1.76-1.09-.75.08-.73.08-.73 1.2.08 1.84 1.24 1.84 1.24 1.07 1.83 2.81 1.3 3.49 1 .11-.78.42-1.3.76-1.6-2.67-.3-5.47-1.33-5.47-5.93 0-1.31.47-2.38 1.24-3.22-.12-.3-.54-1.52.12-3.18 0 0 1.01-.32 3.3 1.23a11.5 11.5 0 0 1 6 0c2.29-1.55 3.3-1.23 3.3-1.23.66 1.66.24 2.88.12 3.18.77.84 1.24 1.91 1.24 3.22 0 4.61-2.81 5.62-5.48 5.92.43.37.81 1.1.81 2.22v3.29c0 .32.22.7.83.58C20.57 22.3 24 17.8 24 12.5 24 5.87 18.63.5 12 .5Z"/></svg>Code</a>
+    <a class="btn" href="data/Supplementary_Data_S1_Cleaned_UHPC_Database.xlsx">Dataset</a>
+    <a class="btn" href="results/pareto_solutions.csv">Pareto set (CSV)</a>
+  </div>
+</div>
+
+<!-- ═══ ABSTRACT ═══ -->
+<div class="section">
+  <h2>Abstract</h2>
+  <p class="abstract-text">The compressive strength of ultra-high-performance concrete (UHPC) with supplementary cementitious materials depends nonlinearly on binder composition, fibres, curing temperature and age. Artificial neural networks (ANNs) initialized by Atom Search Optimization (ASO), Adaptive Equilibrium Optimizer (AEO) or Wind-Driven Optimization (WDO) and refined by Levenberg–Marquardt formed ten-network ensembles trained on 381 records of 38 mixtures containing ground granulated blast-furnace slag (GGBS), silica fume (SF), steel and polypropylene fibres, cured at 28–120 °C. Test-mixture RMSE was 2.13 MPa for selected ANN-AEO, 2.02–2.22 MPa for the other ANNs and 2.34 MPa for Gaussian process regression (GPR); ANN-AEO was significantly more accurate than random forest and linear regression, but not than the standalone ANN, ANN-ASO, ANN-WDO or GPR, and under leave-one-mixture-out validation the standalone ANN ensemble generalized best (2.84 MPa; GPR 3.56 MPa). Ensemble-normalized conformal 95% intervals covered 100% of test observations (mean width 10.1 MPa), and constraint-consistent permutation importance matched measured factor effects (ρ = 0.94). Replacing 40–50% of cement with GGBS plus 12% SF cut embodied CO₂ from 680 to 306–366 kg/m³ and raised 28-day strength from 84.6 to 143–144 MPa. NSGA-III found lower-carbon alternatives of equal predicted strength for 21 of 26 tested mixtures above 120 MPa. Code and a web tool are released.</p>
+  <div class="stats">
+    <div class="stat"><b>381 / 38</b><span>records / mixtures (single laboratory)</span></div>
+    <div class="stat"><b>2.13 MPa</b><span>test RMSE, ANN-AEO ensemble (selected)</span></div>
+    <div class="stat"><b>100%</b><span>test coverage of 95% conformal intervals</span></div>
+    <div class="stat"><b>−55%</b><span>embodied CO₂, G50/SF12 vs OPC</span></div>
+    <div class="stat"><b><span id="nPareto" style="font-size:inherit;color:inherit">–</span></b><span>Pareto-optimal mixtures (NSGA-III)</span></div>
+  </div>
+</div>
+
+<!-- ═══ PARETO FIGURE ═══ -->
+<div class="section">
+  <figure>
+    <img src="assets/fig_pareto.png" alt="Pareto front of strength, embodied CO2 and material cost with five representative mixtures" loading="lazy">
+    <figcaption>Pareto front from NSGA-III within the experimental domain (28 °C curing, 28 days; lower 95% prediction bound ≥ 120 MPa): (a) carbon–cost projection coloured by predicted strength, (b) strength–carbon and (c) strength–cost projections with the tested mixtures (measured), and (d) binder composition of the representative solutions. Plain Pareto mixtures use 30–50% GGBS with 5–15% SF; steel fibre adds strength at a large CO₂ and cost penalty; PP-fibre mixtures are dominated.</figcaption>
+  </figure>
+</div>
+
+<!-- ═══ METHOD ═══ -->
+<div class="section">
+  <h2>Method</h2>
+  <div class="module-list">
+    <p><strong>Hybrid ANNs.</strong> Networks with one or two hidden layers, eight inputs (water, cement, SF, GGBS, curing temperature, age, steel fibre, PP fibre) and [−1, 1] min–max scaling fitted on the training mixtures. Hidden layers, neurons, activation, metaheuristic iterations and Levenberg–Marquardt epochs were selected for each model by grouped cross-validation. Every network is trained by Levenberg–Marquardt (best weights on an inner validation set); the hybrids start from the best weights found by ASO, AEO or WDO (population 50; fitness on inner-training and inner-validation mixtures), the standalone ANN from random weights. Every model is a ten-network ensemble.</p>
+    <p><strong>Mixture-level validation.</strong> 28 training, 5 validation and 5 test mixtures, hyperparameters by grouped 5-fold CV, ten-network ensembles, LOMO cross-validation over all 38 mixtures with statistical tests, and MLR, random forest and GPR baselines.</p>
+    <p><strong>Calibrated uncertainty.</strong> Split-conformal 95% intervals calibrated on the validation mixtures, with widths scaled by the ensemble spread; coverage reported with Clopper–Pearson intervals, mean width and the Winkler score.</p>
+    <p><strong>Domain-restricted optimization.</strong> NSGA-III (population 300, 500 generations, five runs) maximizes strength and minimizes A1–A3 embodied CO₂ and material cost over SF, GGBS and fibre dosage, with binder 740 kg/m³, absolute volume, the convex hull of tested binders, a nearest-neighbour extrapolation limit and a lower 95% bound ≥ 120 MPa (ensemble-normalized interval). The front was verified against exhaustive enumeration (hypervolume ratio 0.999). Representative solutions and TOPSIS follow Wakjira &amp; Goshu (2026).</p>
+  </div>
+  <h3>Performance on unseen mixtures</h3>
+  <div class="scroll">
+  <table class="results-table">
+    <thead><tr><th>Model</th><th>Test R²</th><th>Test RMSE (MPa)</th><th>LOMO RMSE (MPa)</th><th>PICP (%)</th><th>MPIW (MPa)</th></tr></thead>
+    <tbody>
+      <tr><td>ANN (LM) ensemble</td><td>0.997</td><td>2.22</td><td>2.84</td><td>98.1</td><td>11.79</td></tr>
+      <tr><td>ANN-ASO ensemble</td><td>0.997</td><td>2.16</td><td>2.94</td><td>100.0</td><td>11.81</td></tr>
+      <tr class="best"><td>ANN-AEO ensemble (selected)</td><td>0.997</td><td>2.13</td><td>3.33</td><td>100.0</td><td>10.12</td></tr>
+      <tr><td>ANN-WDO ensemble</td><td>0.997</td><td>2.02</td><td>3.02</td><td>100.0</td><td>10.29</td></tr>
+      <tr><td>MLR</td><td>0.964</td><td>7.38</td><td>8.52</td><td>96.2</td><td>29.12</td></tr>
+      <tr><td>Random forest</td><td>0.991</td><td>3.60</td><td>4.38</td><td>98.1</td><td>19.20</td></tr>
+      <tr><td>GPR</td><td>0.996</td><td>2.34</td><td>3.56</td><td>96.2</td><td>9.88</td></tr>
+    </tbody>
+  </table>
+  </div>
+  <p class="table-note">ANNs: ten-network ensembles; intervals are ensemble-normalized split-conformal (ANNs) or constant split-conformal (baselines), calibrated on the validation mixtures. ANN-AEO was selected on the validation mixtures; on the test mixtures it was significantly more accurate than RF and MLR (Wilcoxon, p &lt; 0.05) but not significantly different from ANN (LM), ANN-ASO, ANN-WDO and GPR. Under LOMO, the ANN (LM) ensemble generalized best.</p>
+</div>
+
+<!-- ═══ INTERACTIVE MIX DESIGNER ═══ -->
+<div class="demo-wrapper" id="predictor">
+<section class="demo-section">
+  <h2 style="border:none;margin-bottom:.3rem">Interactive mix designer</h2>
+  <p class="panel-intro">All calculations run in your browser with the trained networks in <code>model.js</code>; nothing is uploaded. Predictions are valid only inside the experimental domain (binder 740 kg/m³, w/b 0.200–0.214, one fibre type, 12.5 mm coarse aggregate, curing 28–120 °C, age 1–56 days); the tool flags extrapolation.</p>
+  <div class="demo-card">
+    <div class="tabs" role="tablist">
+      <button class="tab-btn active" data-tab="tab-predict" role="tab">Predict strength</button>
+      <button class="tab-btn" data-tab="tab-inverse" role="tab">Inverse design</button>
+      <button class="tab-btn" data-tab="tab-optimize" role="tab">Optimize mix</button>
+    </div>
+
+    <!-- Predict -->
+    <div class="tab-panel active" id="tab-predict">
+      <p class="panel-intro">Enter a mixture, or load a tested one. Cement is the remainder of the 740 kg/m³ binder.</p>
+      <div class="grid grid-4" id="inputGrid">
+        <div class="field"><label for="preset">Tested mixture</label><select id="preset"><option value="">— custom —</option></select><small>fills SF, GGBS, water and fibres</small></div>
+        <div class="field"><label for="inSF">Silica fume, SF (kg/m³)</label><input class="field-input" type="number" id="inSF" value="88.8" min="0" max="133.2" step="0.1"><small>tested 0–133.2</small></div>
+        <div class="field"><label for="inGGBS">GGBS (kg/m³)</label><input class="field-input" type="number" id="inGGBS" value="296" min="0" max="370" step="0.1"><small>tested 0–370</small></div>
+        <div class="field"><label>Cement, OPC</label><div class="derived" id="cementOut">–</div></div>
+        <div class="field"><label for="inT">Curing temperature (°C)</label><input class="field-input" type="number" id="inT" value="28" min="28" max="120" step="1"><small>tested 28, 60, 90, 120</small></div>
+        <div class="field"><label for="inAge">Age (days)</label><input class="field-input" type="number" id="inAge" value="28" min="1" max="56" step="1"><small>tested 1, 3, 7, 28, 56</small></div>
+        <div class="field"><label for="inFibre">Fibre type</label><select id="inFibre"><option value="none">None</option><option value="steel">Steel fibre</option><option value="pp">Polypropylene fibre</option></select><small>one type per mixture</small></div>
+        <div class="field"><label for="inFib">Fibre content (kg/m³)</label><input class="field-input" type="number" id="inFib" value="0" min="0" max="78" step="0.1"><small id="fibUnit"></small></div>
+        <div class="field"><label for="inW">Water (L/m³)</label><input class="field-input" type="number" id="inW" value="158" min="148" max="158" step="1"><small>158 plain, 148 with fibres</small></div>
+        <div class="field"><label for="inModel">Network</label><select id="inModel"><option value="ANN_AEO">ANN-AEO (selected)</option><option value="ANN">ANN (LM)</option><option value="ANN_ASO">ANN-ASO</option><option value="ANN_WDO">ANN-WDO</option></select><small>all four are shown below</small></div>
+      </div>
+      <div class="actions"><button id="predictBtn" class="btn-predict">Predict</button><span class="note">Results update as you type.</span></div>
+      <div id="result"></div>
+    </div>
+
+    <!-- Inverse -->
+    <div class="tab-panel" id="tab-inverse">
+      <p class="panel-intro">Target 28-day strength (28 °C curing). The tool returns the Pareto-optimal mixture whose <b>lower</b> 95% prediction bound meets the target with the lowest embodied CO₂, and the lowest-cost alternative.</p>
+      <div class="slider-row">
+        <label for="targetStrength" style="font-weight:600;white-space:nowrap">Target (MPa)</label>
+        <input type="range" id="targetStrength" min="100" max="150" value="130" step="0.5" style="flex:1">
+        <input type="number" id="targetStrengthNum" min="100" max="150" value="130" step="0.5" class="field-input" style="width:90px">
+      </div>
+      <div id="inverseResult" style="margin-top:1rem"></div>
+    </div>
+
+    <!-- Optimize -->
+    <div class="tab-panel" id="tab-optimize">
+      <p class="panel-intro">Set the importance of each objective. TOPSIS ranks the <span id="nParetoB">Pareto</span> solutions by closeness to the ideal mixture.</p>
+      <div class="weights">
+        <div><label for="wStr">Strength (maximize) <span class="wval" id="wStrVal">0.33</span></label><input type="range" id="wStr" min="0" max="100" value="33"></div>
+        <div><label for="wCO2">Embodied CO₂ (minimize) <span class="wval" id="wCO2Val">0.33</span></label><input type="range" id="wCO2" min="0" max="100" value="33"></div>
+        <div><label for="wCost">Material cost (minimize) <span class="wval" id="wCostVal">0.33</span></label><input type="range" id="wCost" min="0" max="100" value="33"></div>
+      </div>
+      <div class="presets"><button data-w="33,33,33">Equal</button><button data-w="60,20,20">Strength-led</button><button data-w="20,60,20">Carbon-led</button><button data-w="20,20,60">Cost-led</button>
+        <label style="margin-left:auto;font-size:.84rem;color:#555">x-axis <select id="xAxis" style="width:auto;padding:.2rem .4rem;font-size:.84rem"><option value="co2">Embodied CO₂</option><option value="cost">Material cost</option></select></label></div>
+      <div id="topsisResult" style="margin-top:.6rem"></div>
+      <h3>Representative solutions</h3>
+      <div class="scroll"><table class="results-table compact" id="repTable"></table></div>
+      <p class="table-note">Interpolated solutions have not been cast; confirm them experimentally before use.</p>
+    </div>
+  </div>
+</section>
+</div>
+<div id="tip"></div>
+
+<!-- ═══ REPRODUCE ═══ -->
+<div class="section">
+  <h2>Data and code</h2>
+  <ul class="plain">
+    <li><a href="data/Supplementary_Data_S1_Cleaned_UHPC_Database.xlsx">Supplementary Data S1</a>: cleaned database (381 records, 38 mixtures), removed records, data split, CO₂ and cost.</li>
+    <li><a href="code/reproduce.py"><code>code/reproduce.py</code></a>: retrains every model and regenerates Tables 8, 13 and 14 and the importance values.</li>
+    <li><a href="code/importance.py"><code>code/importance.py</code></a>: importance of the design factors and their measured effects (Figure 19).</li>
+    <li><a href="code/export_models.py"><code>code/export_models.py</code></a>: trains the representative networks and writes <code>model.json</code>, <code>model.js</code> and <code>matlab/UHPC_models.mat</code>.</li>
+    <li><a href="code/optimize_mix.py"><code>code/optimize_mix.py</code></a>: NSGA-III optimization, representative solutions, TOPSIS and inverse design (Tables 15–16, Figure 24).</li>
+    <li><a href="matlab/UHPC_predict.m"><code>matlab/UHPC_predict.m</code></a> and <a href="matlab/UHPC_inverse_design.m"><code>UHPC_inverse_design.m</code></a>: prediction with 95% intervals in MATLAB.</li>
+  </ul>
+</div>
+
+<!-- ═══ CITE ═══ -->
+<div class="section" id="cite">
+  <h2>Cite this work</h2>
+  <div class="bibtex-wrap">
+    <button class="copy-btn" id="copy-bibtex" title="Copy to clipboard">Copy</button>
+    <pre><code id="bibtex-text">@article{kumar2026hybridann,
+  title   = {Uncertainty-aware hybrid artificial neural networks for strength
+             prediction and mix design optimization of sustainable
+             ultra-high-performance concrete},
+  author  = {Kumar, Divesh Ranjan and Prakash, Shubhum and
+             Senjuntichai, Teerapong and Kaewunruen, Sakdirat},
+  journal = {Journal of Asian Architecture and Building Engineering},
+  year    = {2026},
+  note    = {Under review}
+}</code></pre>
+  </div>
+</div>
+
+<footer>
+  Code: academic and research use license · Data: CC BY 4.0 · Emission factors: Alsomiri et al. (2026) · Unit costs: Wakjira &amp; Goshu (2026), Mater. Today Adv. 32, 100944.<br>
+  Page layout inspired by the <a href="https://twakjira.github.io/CompMoE-UHPC/" target="_blank" rel="noopener">CompMoE-UHPC</a> project page.
+</footer>
+</body>
+</html>

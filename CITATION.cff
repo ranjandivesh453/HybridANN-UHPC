@@ -1,0 +1,31 @@
+cff-version: 1.2.0
+message: "If you use this software or data, please cite the article below."
+title: "HybridANN-UHPC: uncertainty-aware hybrid ANNs for strength prediction and mix design optimization of sustainable UHPC"
+type: software
+license-url: "https://github.com/ranjandivesh453/HybridANN-UHPC/blob/main/LICENSE"
+repository-code: "https://github.com/ranjandivesh453/HybridANN-UHPC"
+url: "https://ranjandivesh453.github.io/HybridANN-UHPC/"
+authors:
+  - family-names: Kumar
+    given-names: Divesh Ranjan
+  - family-names: Prakash
+    given-names: Shubhum
+  - family-names: Senjuntichai
+    given-names: Teerapong
+  - family-names: Kaewunruen
+    given-names: Sakdirat
+preferred-citation:
+  type: article
+  title: "Uncertainty-aware hybrid artificial neural networks for strength prediction and mix design optimization of sustainable ultra-high-performance concrete"
+  journal: "Journal of Asian Architecture and Building Engineering"
+  year: 2026
+  notes: "Under review"
+  authors:
+    - family-names: Kumar
+      given-names: Divesh Ranjan
+    - family-names: Prakash
+      given-names: Shubhum
+    - family-names: Senjuntichai
+      given-names: Teerapong
+    - family-names: Kaewunruen
+      given-names: Sakdirat

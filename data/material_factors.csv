@@ -1,0 +1,10 @@
+key,material,specific_gravity,co2_kg_per_kg,cost_usd_per_kg,co2_source,cost_source
+C,OPC,3.15,0.83,0.082,Alsomiri et al. (2026),Wakjira & Goshu (2026) Table 2
+GGBS,GGBS,2.91,0.019,0.1,Alsomiri et al. (2026),Wakjira & Goshu (2026) Table 2
+SF,Silica fume,2.2,0.014,0.8,Alsomiri et al. (2026),Wakjira & Goshu (2026) Table 2
+W,Water,1.0,0.0,0.001,Alsomiri et al. (2026),Wakjira & Goshu (2026) Table 2
+SP,Superplasticizer,1.077,0.72,3.4,Alsomiri et al. (2026),Wakjira & Goshu (2026) Table 2
+CA,Coarse aggregate (12.5 mm crushed stone),2.82,0.043,0.009,Alsomiri et al. (2026),assumed equal to sand
+FA,Fine aggregate (river sand),2.51,0.024,0.009,Alsomiri et al. (2026),Wakjira & Goshu (2026) Table 2 (sand)
+StF,Steel fibre,7.8,2.68,1.0,Alsomiri et al. (2026),Wakjira & Goshu (2026) Table 2
+PPF,PP fibre,0.91,1.6,3.0,Alsomiri et al. (2026),assumed (not in Wakjira & Goshu 2026)

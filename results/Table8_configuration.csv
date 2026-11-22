@@ -1,0 +1,5 @@
+Model,Hidden neurons,Activation,Metaheuristic iterations,LM epochs,Grouped CV RMSE,Time per network (s),Function evaluations per network
+ANN,10,logsig,-,300,5.36,0.27,0
+ASO,15-15,logsig,300,300,5.53,4.72,15000
+AEO,5,logsig,500,300,4.82,1.23,31350
+WDO,5-5,tansig,300,300,5.26,1.24,15050

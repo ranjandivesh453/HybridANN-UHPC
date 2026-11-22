@@ -1,0 +1,22 @@
+Model,Subset,R2,RMSE,MAE,MAPE,Single-network RMSE (mean ± SD)
+ANN ensemble,Training,0.998,1.920,1.420,1.941,2.65 ± 0.69
+ANN ensemble,Validation,0.995,2.659,2.300,2.821,3.37 ± 0.61
+ANN ensemble,Test,0.997,2.218,1.781,2.108,3.01 ± 0.58
+ASO ensemble,Training,0.998,1.814,1.308,1.691,2.52 ± 0.27
+ASO ensemble,Validation,0.996,2.385,2.014,2.353,3.23 ± 1.01
+ASO ensemble,Test,0.997,2.155,1.827,2.207,3.09 ± 0.89
+AEO ensemble,Training,0.995,2.638,1.939,2.499,3.58 ± 0.61
+AEO ensemble,Validation,0.997,2.244,1.799,2.234,3.24 ± 0.40
+AEO ensemble,Test,0.997,2.131,1.638,1.999,3.33 ± 0.84
+WDO ensemble,Training,0.998,1.956,1.446,1.880,2.80 ± 0.51
+WDO ensemble,Validation,0.993,3.345,2.708,3.536,5.56 ± 7.20
+WDO ensemble,Test,0.997,2.022,1.684,2.147,3.12 ± 0.46
+MLR,Training,0.957,8.137,6.464,8.842,-
+MLR,Validation,0.963,7.500,6.322,8.411,-
+MLR,Test,0.964,7.377,6.171,8.274,-
+RF,Training,0.999,1.476,0.939,1.221,-
+RF,Validation,0.991,3.772,2.849,3.229,-
+RF,Test,0.991,3.604,2.675,3.214,-
+GPR,Training,0.999,1.385,0.962,1.305,-
+GPR,Validation,0.996,2.574,2.274,2.716,-
+GPR,Test,0.996,2.339,1.814,2.169,-
